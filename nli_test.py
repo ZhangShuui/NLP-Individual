@@ -31,6 +31,7 @@ from typing import Iterable, List, Sequence
 
 import torch
 import openai  # type: ignore
+import datasets
 from datasets import load_dataset
 from torch.utils.data import DataLoader
 from transformers import (
