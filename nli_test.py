@@ -41,7 +41,8 @@ from transformers import (
 )
 from tqdm.auto import tqdm
 from sklearn.metrics import accuracy_score, f1_score
-
+openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"), base_url=os.getenv("OPENAI_API_BASE", "https://api.openai.com/v1"))
+openai_async_client = openai.AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"), base_url=os.getenv("OPENAI_API_BASE", "https://api.openai.com/v1"))
 # ---------------------------------------------------------------------------
 # Prompt Templates
 # ---------------------------------------------------------------------------
@@ -308,7 +309,13 @@ async def _call_chat_api(messages: List[dict], model: str, retry: int = 3):
     """Single request with exponential back‑off重试."""
     for attempt in range(retry):
         try:
-            resp = await openai.ChatCompletion.acreate(model=model, messages=messages)
+            resp = await openai_async_client.chat.completions.create(
+                model=model,
+                messages=messages,
+                temperature=0.0,
+                max_tokens=200,
+                n=1,
+            )
             return resp["choices"][0]["message"]["content"].strip().lower()
         except Exception as e:
             if attempt == retry - 1:
